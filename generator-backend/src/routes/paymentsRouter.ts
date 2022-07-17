@@ -1,9 +1,9 @@
-import express, { Request, Response } from 'express';
+import express, { Router } from 'express';
+import * as paymentController from '../controllers/paymentController';
 
-const router = express.Router();
+const router: Router = express.Router();
 
-router.get('/payment', (req: Request, res: Response) => {
-	res.json(`id = ${1}`);
-});
+router.get('/payments', paymentController.allPayments);
+router.post('/payment', paymentController.addPayment);
 
 export default router;

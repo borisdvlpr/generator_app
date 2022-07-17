@@ -1,5 +1,6 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
+import bodyParser from 'body-parser';
 import generatorRouter from './routes/generatorRouter';
 import paymentsRouter from './routes/paymentsRouter';
 
@@ -13,6 +14,8 @@ const options: cors.CorsOptions = {
 app.use(cors(options));
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req: Request, res: Response) => {
 	res.send(`
