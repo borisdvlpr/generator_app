@@ -25,7 +25,7 @@ export default function useRequest(urlAPI: string) {
 			.finally(() => { setLoading(false); });
 	}, [urlAPI]);
 
-	const reFetch = async () => {
+	const reFetchGenerator = async () => {
 		setLoading(true);
 		await axios
 			.get(urlAPI)
@@ -34,5 +34,5 @@ export default function useRequest(urlAPI: string) {
 			.finally(() => { setLoading(false); });
 	}
 
-	return [data, loading, error, reFetch] as const;
+	return [data, loading, error, reFetchGenerator] as const;
 }

@@ -2,21 +2,21 @@ import React, { ReactElement, useState, useEffect } from "react";
 
 import Container from 'react-bootstrap/Container';
 import CodeDisplay from "../../components/CodeDisplay/CodeDisplay";
-import TableComponent from "../../components/Table/Table";
-import useRequest from "../../api/useRequest";
+import MatrixTable from "../../components/MatrixTable/MatrixTable";
+import useRequest from "../../api/useGenerator";
 
 export default function Generator(): ReactElement {
-	const [requestedData, loadingData, errorData, reFetchData] = useRequest(`http://localhost:3001/api/generator`);
+	const [dataGenerator, loadingData, errorData, reFetchData] = useRequest(`http://localhost:3001/api/generator`);
 	const [generatorCode, setGeneratorCode] = useState();
 	const [secretCode, setSecretCode] = useState('');
-	const [secretCodeCount, setSecretCodeCount] = useState(0)
+	const [secretCodeCount, setSecretCodeCount] = useState(0);
 	const [isRequested, setRequested] = useState(false);
 	
 	function onClickGenerate() {
 		if(!loadingData && !errorData && !isRequested) {
 			setRequested(true);
-			setGeneratorCode(requestedData?.code);
-			setSecretCode(requestedData?.secret);
+			setGeneratorCode(dataGenerator?.code);
+			setSecretCode(dataGenerator?.secret);
 
 		} else {
 			if(errorData) {
@@ -31,11 +31,11 @@ export default function Generator(): ReactElement {
 		if(isRequested) {
 			gridUpdate = setInterval(() => {
 				reFetchData();
-				setGeneratorCode(requestedData?.code);
+				setGeneratorCode(dataGenerator?.code);
 				setSecretCodeCount(secretCodeCount + 1);
 
 				if(secretCodeCount % 2 === 0) {
-					setSecretCode(requestedData?.secret);
+					setSecretCode(dataGenerator?.secret);
 				}
 			}, 1000);
 	
@@ -56,7 +56,7 @@ export default function Generator(): ReactElement {
 				<button type="button" className="btn btn-primary" onClick={() => onClickGenerate()}>Generate 2D Grid</button>
 			</div>
 		
-			<TableComponent generatedCode={generatorCode} />
+			<MatrixTable generatedCode={generatorCode} />
 
 			<CodeDisplay displayMessage={'YOUR CODE'} secretCode={secretCode} />
 		</Container>

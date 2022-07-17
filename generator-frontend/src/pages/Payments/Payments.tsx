@@ -1,78 +1,76 @@
 import React, { ReactElement, useState, useEffect } from "react";
 
 import Container from 'react-bootstrap/Container';
-import CodeDisplay from "../../components/CodeDisplay/CodeDisplay";
-import Table from 'react-bootstrap/Table';
-import useRequest from "../../api/useRequest";
+import CodeDisplay from '../../components/CodeDisplay/CodeDisplay';
+import PaymentsTable from "../../components/PaymentsTable/PaymentsTable";
+import useGenerator from '../../api/useGenerator';
+import usePayment from '../../api/usePayment';
 
 export default function Payments(): ReactElement {
-    const [requestedData, loadingData, errorData, reFetchData] = useRequest(`http://localhost:3001/api/generator`);
-    const [generatorCode, setGeneratorCode] = useState();
+    const [dataGenerator, loadingGenerator, errorGenerator, reFetchGenerator] = useGenerator(`http://localhost:3001/api/generator`);
+    const [dataPayments, loadingPayments, errorPayments, reFetchPayments, postPayments] = usePayment(`http://localhost:3001/api/payments`);
+    const [generatorCode, setGeneratorCode] = useState('');
 	const [secretCode, setSecretCode] = useState('');
 	const [secretCodeCount, setSecretCodeCount] = useState(0);
+    const [name, setName] = useState('');
+    const [amount, setAmount] = useState('');
+
+    function handleFormSubmit(event: any) {
+        event.preventDefault();
+
+        if(name && amount && generatorCode && secretCode) {
+            postPayments(name, amount, secretCode, generatorCode.toString());
+
+            reFetchPayments();
+            setName('');
+            setAmount('');
+
+        } else {
+            alert('Fill all fields!');
+        }
+    }
 
     useEffect(() => {
 		let gridUpdate: any;
 		
         gridUpdate = setInterval(() => {
-            reFetchData();
-            setGeneratorCode(requestedData?.code);
+            reFetchGenerator();
+            setGeneratorCode(dataGenerator?.code);
             setSecretCodeCount(secretCodeCount + 1);
 
             if(secretCodeCount % 2 === 0) {
-                setSecretCode(requestedData?.secret);
+                setSecretCode(dataGenerator?.secret);
             }
         }, 1000);
 
         return () => { 
             clearInterval(gridUpdate); 
         };
-	});
+    });
 
     return (
         <Container>
             <CodeDisplay displayMessage="YOUR CODE NOW" secretCode={secretCode} />
 
             <div className="d-flex flex-row align-items-end justify-content-start mt-5 mb-5">
-				<form className="d-flex flex-row">
+				<form className="d-flex flex-row" onSubmit={(event) => handleFormSubmit(event)}>
                     <div className="me-lg-3">
-                        <label className="control-label col-sm-3 small" htmlFor="char-search">Payment</label>
-          			    <input type="text" id="char-search" className="form-control form-control-dark" placeholder="Payment" aria-label="Search" />
+                        <label className="control-label col-sm-3 small" htmlFor="input-name">Payment</label>
+          			    <input type="text" id="input-name" className="form-control form-control-dark" value={name} placeholder="Payment" onChange={(event) => setName(event.target?.value)} />
                     </div>
 					
                     <div className="me-lg-3">
-                        <label className="control-label col-sm-3 small" htmlFor="char-search">Amount</label>
-          			    <input type="number" id="char-search" className="form-control form-control-dark" placeholder="Amount" aria-label="Search" />
+                        <label className="control-label col-sm-3 small" htmlFor="input-amount">Amount</label>
+          			    <input type="text" id="input-amount" className="form-control form-control-dark" value={amount} placeholder="Amount" onChange={(event) => setAmount(event.target?.value)} />
+                    </div>
+
+                    <div className="align-self-end">
+                        <button type="submit" className="btn btn-primary">+ ADD</button>
                     </div>
         		</form>
-
-				<button type="button" className="btn btn-primary">+ ADD</button>
 			</div>
 
-            <Table bordered responsive>
-                <thead>
-                    <tr>
-                        <th scope="col">NAME</th>
-                        <th scope="col">AMOUNT</th>
-                        <th scope="col">CODE</th>
-                        <th scope="col">GRID</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr className="border-top-0">
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                    </tr>
-                </tbody>
-            </Table>
+            <PaymentsTable paymentsData={dataPayments} />
 		</Container>
     );
 }

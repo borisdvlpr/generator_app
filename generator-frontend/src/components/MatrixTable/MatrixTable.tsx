@@ -6,7 +6,7 @@ type Code = {
     generatedCode?: string[][];
 }
 
-export default function TableComponent(props: Code): ReactElement {
+export default function MatrixTable(props: Code): ReactElement {
     return (
         <Table bordered responsive size="sm">
             <tbody>
