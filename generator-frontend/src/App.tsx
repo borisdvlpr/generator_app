@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Generator from './pages/Generator/Generator';
 import Payments from './pages/Payments/Payments';
 
-function App() {
+export default function App() {
 	return (
 		<>
 			<Router>
@@ -16,5 +16,3 @@ function App() {
 		</>
 	);
 }
-
-export default App;
